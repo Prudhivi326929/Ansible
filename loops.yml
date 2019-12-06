@@ -1,0 +1,37 @@
+-
+    name: 'Print list of fruits'
+    hosts: localhost
+    fruits:
+        - Apple
+        - Banana
+        - Grapes
+        - Orange
+    tasks:
+        -
+            command: echo '{{ item }}'
+            with_items: '{{fruits}}'
+        -
+            yum: name={{item}} state=present
+            with_items:
+              - httpd
+              - ksh
+              - gcc
+        -
+            debug: var=item
+            with_file:
+              - '/etc/hosts'
+              - '/etc/resolv.conf'
+              - '/etc/ntp.conf'
+        -
+            debug: var=item
+            with_url:
+              - "https://google.com"
+              - "https://facebook.com"
+        -
+            debug: msg="DB={{ item.database }} PID={{ item.pid}}"
+            with_mongodb:
+              - database: dev
+                connection_string: "mongodb://dev.mongo/"
+              - database: prod
+                connection_string: "mongodb://prod.mongo/"
+              

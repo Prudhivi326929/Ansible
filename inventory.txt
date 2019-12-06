@@ -1,3 +1,5 @@
+localhost ansible_connection=localhost nameserver_ip=10.1.250.10 snmp_port=160-161
+
 [web_servers]
 web1 ansible_host=web1.example.com ansible_connection=ssh ansible_user=root ansible_ssh_pass=password
 web2 ansible_host=web2.example.com ansible_connection=ssh ansible_user=root ansible_ssh_pass=password

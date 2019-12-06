@@ -1,0 +1,11 @@
+[web_servers]
+web1 ansible_host=web1.example.com ansible_connection=ssh ansible_user=root ansible_ssh_pass=password
+web2 ansible_host=web2.example.com ansible_connection=ssh ansible_user=root ansible_ssh_pass=password
+
+[db_servers]
+db1 ansible_host=db1.example.com ansible_connection=winrm ansible_user=administrator ansible_password=password
+db2 ansible_host=db2.example.com ansible_connection=winrm ansible_user=administrator ansible_password=password
+
+[all:children]
+web_servers
+db_servers

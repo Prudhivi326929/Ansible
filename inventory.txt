@@ -1,3 +1,6 @@
+db_and_web+server1 ansible_host=192.168.1.1 ansible_ssh_pass=Passw0rd
+db_and_web+server2 ansible_host=192.168.1.2 ansible_ssh_pass=Passw0rd
+
 localhost ansible_connection=localhost nameserver_ip=10.1.250.10 snmp_port=160-161
 
 [web_servers]

@@ -5,7 +5,15 @@
     - command: /etc/monitoring.py
       async: 360  #async - how long to run
       poll: 60    #poll - how frequently to check. default is 10
+      register: webapp_result
       
    -  command: /opt/monitor_database.py
       async: 360
       poll: 0
+      register: dbapp_result
+      
+   -  name: check status of both above tasks
+      async_status: jid={{ webapp_result.ansible_job_id }}
+      register: job_result
+      until: job_result.finished
+      retries: 30

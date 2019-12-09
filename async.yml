@@ -1,0 +1,11 @@
+#playbook to contain ansible asynchronous events
+- name: Deploye web application
+  hosts: db_server, web_server
+  tasks:
+    - command: /etc/monitoring.py
+      async: 360  #async - how long to run
+      poll: 60    #poll - how frequently to check. default is 10
+      
+   -  command: /opt/monitor_database.py
+      async: 360
+      poll: 0

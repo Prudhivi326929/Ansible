@@ -1,0 +1,24 @@
+#ansible example to display strategies
+- name: playbook contain different types of strategies
+  strategy: free #here doing tasks on the hosts is independent. but order on each server is as per the order of tasks written
+  # if you don't specify strategy, default is Linear strategy where the task1 happen on all hosts first and once it finishes on all hosts, it will run the next task on all the servers. like that it will go on.
+  
+  
+  #seriel: 3 #here you mention number of servers to finish the tasks first. once they are done with all the tasks, execution starts on remaining servers.
+  
+  #serial: 20% you can say percentage wise also
+  
+  serial:
+    - 2
+    - 3
+    - 5
+    
+  host: server1, server2, server3
+  tasks:
+    - name;
+    
+    - name:
+    
+    - name:
+    
+    - name: 

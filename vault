@@ -1,0 +1,14 @@
+ansible-vault encrypt inventory.txt #this will encrypt the inventory file which is having passwords
+  it will ask for new vault password to encrypt
+
+ansible-playbook playbook.yml -i inventory.txt will give error as the inventory file is encrypted.
+
+ansible-playbook playbook.yml -i inventory.txt ask_vault_pass  #this will ask for vault password and then execute the playbook
+
+ansible-playbook playbook.yml -i inventory.txt -vault-password-file var/pass.txt  #this is way of storing the vault password in a file
+
+ansible-playbook playbook.yml -i inventory.txt -vault-password-file var/pass.py #use python file to get the password
+
+ansible-vault view inventory.txt
+
+ansible-vault create inventory.txt

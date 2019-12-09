@@ -1,0 +1,31 @@
+-
+  name: Deploy a web application
+  hosts: app_servers
+  any_errors_fatal: true #if any task fails on any server, it will stop the execution of tasks on all servers and exit
+  vars:
+    db_name: employee_db
+    db_user: db_user
+    db_password: Passw0rd
+  tasks:
+    - name: Install dependencies
+      apt: name={{ item }} state=installed
+      with_items:
+       - python
+       - python-setuptools
+       - python-dev
+       - build-essential
+       - python-pip
+       - python-mysqldb
+    - name: "Send notification email"
+      mail:
+        to: devops@corp.com
+        subject: Server Deployed!
+        body: Web Server Deployed Successfully
+      ignore_errors: true #this will ignore errors and finish this email task anyway
+      
+    - name: conditional fail
+      command: cat /var/log/server.log
+      register: command_output
+      failed_when: " "ERROR" in command_output.stdout "
+      
+      

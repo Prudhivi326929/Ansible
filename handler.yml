@@ -1,0 +1,17 @@
+- name: test-handler
+  hosts: localhost
+  sudo: yes
+  vars:
+    - server_port: 8080
+  tasks:
+    - name: install nginx
+      yum:
+        pkg: nginx
+        state: installed
+    - name: serve nginx config
+      template: src=../files/flask.conf dest=/etc/nginx/conf.d/
+      notify:
+        - restart nginx
+  handlers:
+    - name: restart nginx   #this must be same as the notify in particular task. So once that task finishes, the below command executes.
+      service: name=nginx state=restarted

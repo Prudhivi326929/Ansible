@@ -1,0 +1,163 @@
+- name: Deploy artifactory.healthcareit.net
+  vars:
+    host: artifactory.healthcareit.net
+
+    device_name: /dev/sdf
+    main_app_data_mount_point: /mnt/main_app_data
+    filesystem_type: ext4
+
+    nginx_package_name: nginx
+    nginx_config_path: /etc/nginx
+    nginx_config_name: "artifactory.healthcareit.net.conf"
+    nginx_cert_path: /etc/pki/tls/certs/{{host}}.crt
+    nginx_key_path: /etc/pki/tls/private/{{host}}.key
+
+    artifactory_startup_file_path: "files/artifactory.startup"
+    artifactory_var_symlink_src: "{{main_app_data_mount_point}}/artifactory/var"
+    artifactory_opt_symlink_src: "{{main_app_data_mount_point}}/artifactory/opt"
+    artifactory_etc_symlink_src: "{{main_app_data_mount_point}}/artifactory/etc"
+    # artifactory_package_url: "https://artifactory.healthcareit.net/artifactory/toolchain/artifactory/artifactory-6.6.2.rpm"
+    artifactory_data_path: /var/opt/jfrog
+    artifactory_config_path: /etc/opt/jfrog
+    artifactory_application_path: /opt/jfrog
+    artifactory_user: artifactory
+    artifactory_group: artifactory
+    artifactory_uid: 1001
+    artifactory_gid: 1001
+
+  hosts: main_app
+  become: true
+  tasks: 
+    - name: "Set hostname"
+      hostname:
+        name: "{{host}}"
+    - name: "Create EXT4 fs on {{device_name}}"
+      filesystem: 
+        fstype: "{{filesystem_type}}"
+        dev: "{{device_name}}"
+    - name: Mount fs.
+      mount: 
+        path: "{{main_app_data_mount_point}}"
+        src: "{{device_name}}"
+        fstype: "{{filesystem_type}}"
+        state: mounted
+
+    # Install java
+    - name: Install java
+      package:
+        name: java-1.8.0-openjdk
+        state: present
+
+    # Install nginx_status_facts
+    - name: Install nginx
+      yum:
+        name: "{{nginx_package_name}}"
+        state: latest
+    - name: Copy over nginx config file
+      copy:
+        src: "files/{{nginx_config_name}}"
+        dest: "{{nginx_config_path}}/conf.d/{{nginx_config_name}}"
+    - name: Copy certificate
+      copy:
+        src: "files/{{host}}.crt"
+        dest: "{{nginx_cert_path}}"
+        owner: nginx
+        group: nginx
+        mode: 0644
+    - name: Copy key
+      copy:
+        src: "files/{{host}}.key"
+        dest: "{{nginx_key_path}}"
+        owner: nginx
+        group: nginx
+        mode: 0600
+
+    # Install artifactory
+    - name: Install yum repository
+      copy: 
+        src: "files/bintray-jfrog-artifactory-pro-rpms.repo"
+        dest: "/etc/yum.repos.d/bintray-jfrog-artifactory-pro-rpms.repo"
+        owner: root 
+        group: root 
+        mode: 0644
+
+    - name: Create artifactory group
+      group:
+        gid: "{{artifactory_gid}}"
+        name: "{{artifactory_group}}"
+        state: present
+    - name: Create artifactory user
+      user:
+        uid: "{{artifactory_uid}}"
+        name: "{{artifactory_user}}"
+        group: "{{artifactory_group}}"
+        shell: /bin/bash
+        append: yes
+
+    - name: Create and chown artifactory var directory
+      file:
+        path   : "{{artifactory_var_symlink_src}}"
+        owner  : "{{artifactory_user}}"
+        group  : "{{artifactory_group}}"
+        recurse: true
+    - name: Create and chown artifactory opt directory
+      file:
+        path   : "{{artifactory_opt_symlink_src}}"
+        owner  : "{{artifactory_user}}"
+        group  : "{{artifactory_group}}"
+        recurse: true
+    - name: Create and chown artifactory etc directory
+      file:
+        path   : "{{artifactory_etc_symlink_src}}"
+        owner  : "{{artifactory_user}}"
+        group  : "{{artifactory_group}}"
+        recurse: true
+    - name: Symlink artifactory data directory
+      file:
+        dest : "{{artifactory_data_path}}"
+        src  : "{{artifactory_var_symlink_src}}"
+        owner: "{{artifactory_user}}"
+        group: "{{artifactory_group}}"
+        state: link
+    - name: Symlink artifactory config directory
+      file:
+        dest : "{{artifactory_config_path}}"
+        src  : "{{artifactory_etc_symlink_src}}"
+        owner: "{{artifactory_user}}"
+        group: "{{artifactory_group}}"
+        state: link
+    - name: Symlink artifactory application directory
+      file:
+        dest : "{{artifactory_application_path}}"
+        src  : "{{artifactory_opt_symlink_src}}"
+        owner: "{{artifactory_user}}"
+        group: "{{artifactory_group}}"
+        state: link
+
+    - name: Copy over startup file
+      copy:
+        src  : "{{artifactory_startup_file_path}}"
+        dest : "/etc/init.d/artifactory"
+        owner: "{{artifactory_user}}"
+        group: "{{artifactory_group}}"
+        mode : "0700"
+        force: no
+
+
+#     - name: Install artifactory
+#       package:
+#         name: "{{artifactory_package_url}}"
+#         state: present
+
+
+## START THEM SERVICES!!!
+    - name: Start artifactory
+      service:
+        name: artifactory
+        state: started
+        enabled: true
+    - name: Start nginx
+      service:
+        name: nginx
+        state: started
+        enabled: true

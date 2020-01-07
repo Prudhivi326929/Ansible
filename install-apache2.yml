@@ -1,0 +1,46 @@
+- name: to check block and rescue
+  hosts: localhost
+  vars:
+    http_port: 8081
+  tasks:
+    - name: checking ansible facts
+      debug:
+        msg: ansible distribution is {{ansible_facts['distribution']}}
+    - name: install and configure Apache
+      block:
+        - name: install httpd and change port to 8081
+          apt:
+            name: '{{ item }}'
+            update_cache: yes
+            state: present
+          with_items:
+            - apache2
+            - git
+          notify:
+            - restart apache2
+        - name: apache2 listen on port 8081
+          lineinfile:
+            dest: /etc/apache2/ports.conf
+            regexp: "Listen 80"
+            line: "Listen {{ http_port }}"
+            state: present
+          notify:
+            - restart apache2
+        - name: clone basic html template
+          git:
+            repo: https://github.com/do-community/ansible-apache-tutorial.git
+            dest: /var/www/example.com
+            update: yes
+          notify:
+            - restart apache2
+        - name: copy index.html file to /var/www/html
+          copy:
+            src: /var/www/example.com/index.html
+            dest: /var/www/html/index.html
+          notify:
+            - restart apache2
+      when: ansible_facts['distribution'] == 'Ubuntu'
+      become: true
+  handlers:
+    - name: restart apache2
+      service: name=apache2 state=restarted

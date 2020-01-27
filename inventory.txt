@@ -2,6 +2,7 @@ db_and_web+server1 ansible_host=192.168.1.1 ansible_ssh_pass=Passw0rd
 db_and_web+server2 ansible_host=192.168.1.2 ansible_ssh_pass=Passw0rd
 
 localhost ansible_connection=localhost nameserver_ip=10.1.250.10 snmp_port=160-161
+jenkins ansible_host=10.xx.xx.xx ansible_connection=ssh ansible_user=ec2-user ansible_ssh_private_key_file=/home/sprudhivi/toolchain-prod.pem
 
 [web_servers]
 web1 ansible_host=web1.example.com ansible_connection=ssh ansible_user=root ansible_ssh_pass=password

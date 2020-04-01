@@ -1,0 +1,35 @@
+---
+  - name: install mysql
+    hosts: localhost
+    tasks:
+      - name: copy repo file
+        copy: src=/etc/yum.repos.d/CentOS-Base.repo dest=/etc/yum.repos.d/CentOS-Base.repo
+
+      - name: install wget
+        yum: name=wget state=installed
+
+
+      - name: install jdk
+        get_url: 
+          url: http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm
+          dest: /opt/jdk-8u131-linux-x64.rpm
+          headers: 'Cookie: oraclelicense=accept-securebackup-cookie'
+
+      - name: install jdk
+        yum: name=/opt/jdk-8u131-linux-x64.rpm state=present
+
+      - name: install python
+        yum: name=MySQL-python state=installed
+
+
+      - name: download the library
+        get_url: url=http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm dest=/tmp/mysql-community-release-el7-5.noarch.rpm
+
+      - name: install the repo
+        yum: name=/tmp/mysql-community-release-el7-5.noarch.rpm state=present
+
+      - name: install the mysql
+        yum: name=mysql-server state=installed
+
+      - name: start the mysql
+        service: name=mysqld state=restarted

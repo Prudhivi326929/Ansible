@@ -5,8 +5,11 @@
       - name: copy repo file
         copy: src=/etc/yum.repos.d/CentOS-Base.repo dest=/etc/yum.repos.d/CentOS-Base.repo
 
-      - name: install wget
-        yum: name=wget state=installed
+      - name: install wget,unzip
+        yum: name={{ item }} state=installed
+        with_items: 
+          - wget
+          - unzip
 
 
       - name: install jdk
@@ -33,3 +36,10 @@
 
       - name: start the mysql
         service: name=mysqld state=restarted
+
+
+      - name: unzip the zip file
+        unarchive: 
+          src: https://artifactory.healthcareit.net/artifactory/toolchain/incorta/incorta-package_4.5.11.zip
+          dest: /incorta
+          remote_src: yes

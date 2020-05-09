@@ -1,0 +1,28 @@
+---
+
+- hosts: localhost
+  become: ture
+  tasks:
+    - name: installing unzip
+      yum: 
+        name: unzip
+        state: present
+
+    - name: download and unzip the new relic java agent
+      unarchive:
+        src: https://download.newrelic.com/newrelic/java-agent/newrelic-agent/current/newrelic-java.zip
+        dest: /opt/
+        remote_src: yes
+
+    - name: copy license key
+      lineinfile:
+        path: /opt/newrelic/newrelic.yml
+        regexp: '<%= license_key %>'
+        line: '  license_key: 5f24bb2423ca88e7448e1cb1aca0496d53b4227c'
+
+    - name: update app_name
+      lineinfile:
+        path: /opt/newrelic/newrelic.yml
+        regexp: '  app_name: My Application'
+        line: '  app_name: Artifactory'
+        firstmatch: yes

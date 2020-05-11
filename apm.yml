@@ -18,7 +18,7 @@
       lineinfile:
         path: /opt/newrelic/newrelic.yml
         regexp: '<%= license_key %>'
-        line: '  license_key: 5f24bb2423ca88e7448e1cb1aca0496d53b4227c'
+        line: '  license_key: 5f24bb2423ca88lkasjdf48e1casdlfkjasdfa0496d53b4227c'
 
     - name: update app_name
       lineinfile:
